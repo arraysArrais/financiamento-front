@@ -1,0 +1,9 @@
+.cardContainer{
+    max-width: 300px;
+}
+
+.mainContainer{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
