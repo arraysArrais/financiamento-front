@@ -1,60 +1,35 @@
-import classes from './HeroBullets.module.css';
 import { Container, Title, Text, Card, Image, Badge, Button, Group } from '@mantine/core';
-import { IconCheck } from '@tabler/icons-react';
 import './style.css'
 import { useEffect, useState } from 'react';
-import {SquirtleLoading} from '../../components/SquirtleLoading/SquirtleLoading';
+import { WalkLoading } from '../../components/Loadings/WalkLoading/WalkLoading';
+import useApi from "../../services/financiamentoService"
+import { FinanciamentoProps } from './types/Financiamento.type';
 
 
 export const Financiamentos = () => {
-    const mockedData = [
-        {
-            id: 1,
-            objeto: "GOL 1.6 MSI 8V 2022",
-            status: "pendente",
-            ultima_parcela: "06/11/2022",
-            status_ult_parcela: "PAGO",
-            descricao: 'Carro muito novo, pouco usado, carro de idosa, carro de garagem, usado somente aos fins de semana, carro de rodovia, nunca foi uber e nunca levou tiro',
-            total_parcelas: 48,
-            parcelas_pagas: 8,
-        },
-        {
-            id: 2,
-            objeto: "GOL 1.6 MSI 8V 2021",
-            status: "pendente",
-            ultima_parcela: "06/11/2022",
-            status_ult_parcela: "PAGO",
-            descricao: 'Carro muito novo, pouco usado, carro de idosa, carro de garagem, usado somente aos fins de semana, carro de rodovia, nunca foi uber e nunca levou tiro',
-            total_parcelas: 48,
-            parcelas_pagas: 21,
-        },
-        {
-            id: 3,
-            objeto: "GOL 1.6 MSI 8V 2020",
-            status: "pendente",
-            ultima_parcela: "06/11/2022",
-            status_ult_parcela: "PAGO",
-            descricao: 'Carro muito novo, pouco usado, carro de idosa, carro de garagem, usado somente aos fins de semana, carro de rodovia, nunca foi uber e nunca levou tiro',
-            total_parcelas: 36,
-            parcelas_pagas: 15,
-        }
-    ]
+    const apiServices = useApi();
     const [loading, setLoading] = useState(true);
+    const [data, setData] = useState<FinanciamentoProps[]>([]);
 
-    //simulando carregamento da chamada api
     useEffect(() => {
-        setTimeout(() =>{
-            setLoading(false)
-            console.log("Carregado!")
-        }, 2000)
-    },[]);
+        const fetchData = async () => {
+            var result = await apiServices.getFinanciamentos()
+            setTimeout(async () => {
+                if (result) {
+                    setLoading(false)
+                    setData(result)
+                }
+                console.log(result)
+            }, 2000)
+        }
+        fetchData();
+    }, []);
 
-    
     return (
-        loading ? <SquirtleLoading/> : (
+        loading ? <WalkLoading /> : (
             <Container size="md">
                 <div className='mainContainer'>
-                    {mockedData.map((e) => (
+                    {data.map((e) => (
                         <div className='cardContainer' key={e.id}>
                             <Card shadow="sm" padding="lg" radius="md" withBorder>
                                 <Card.Section>
@@ -64,19 +39,22 @@ export const Financiamentos = () => {
                                         alt="Norway"
                                     />
                                 </Card.Section>
-    
+
                                 <Group justify="space-between" mt="md" mb="xs" align='left'>
+                                    {(e.status == 'Em dia') ? 
+                                    <Badge color="green" variant="light">
+                                        {e.status}
+                                    </Badge> 
+                                    : 
                                     <Badge color="pink" variant="light">
                                         {e.status}
-                                    </Badge>
+                                    </Badge>}
                                     <Badge color='white' variant='light'>
-                                        {`${e.parcelas_pagas}/${e.total_parcelas}`}
+                                        {`${e.parcelas_pagas}/${e.parcelas.length}`}
                                     </Badge>
                                     <Text fw={500}>{e.objeto}</Text>
                                 </Group>
-                                <Text size='sm' c="dimmeds" /* truncate="end" */ lineClamp={4}>
-                                    {e.descricao}
-                                </Text>
+                                <Text size='xs' c="dimmeds" /* truncate="end" */ lineClamp={4}>DESCRIÇÃO MOCKADA DESCRIÇÃO MOCKADA</Text>
                                 <Button variant="light" color="blue" fullWidth mt="md" radius="md">
                                     Detalhe
                                 </Button>
@@ -87,6 +65,6 @@ export const Financiamentos = () => {
             </Container>
         )
     )
-    
+
 
 }
