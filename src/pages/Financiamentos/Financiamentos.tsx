@@ -1,9 +1,11 @@
-import { Text, Card, Image, Badge, Button, Group, Flex } from '@mantine/core';
 import './style.css'
+import { Text, Card, Image, Badge, Button, Group, Flex, } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { WalkLoading } from '../../components/Loadings/WalkLoading/WalkLoading';
 import useApi from "../../services/financiamentoService"
 import { FinanciamentoProps } from './types/Financiamento.type';
+import ImagePlaceholder from '../../assets/image-placeholder.jpg'
+
 
 export const Financiamentos = () => {
     const apiServices = useApi();
@@ -23,6 +25,7 @@ export const Financiamentos = () => {
         }
         fetchData();
     }, []);
+
     return (
         loading ? <WalkLoading /> : (
             <Flex gap={50} className='rolo' justify={'center'}>
@@ -30,11 +33,17 @@ export const Financiamentos = () => {
                     {data.map((e) => (
                         <Card shadow="sm" padding="lg" radius="md" className='cardFinanciamento' withBorder key={e.id}>
                             <Card.Section>
-                                <Image
-                                    src={"https://www.autocerto.com/fotos/337/894685/20.jpg"}
-                                    height={160}
-                                    alt="Norway"
-                                />
+                                {(e.img_string !== 'N/A')
+                                    ?
+                                    <Image
+                                        src={`data:${e.img_objeto_tipo};base64,${e.img_string}`}
+                                        height={160}
+                                    />
+                                    :
+                                    <Image
+                                        src={ImagePlaceholder}
+                                        height={160}
+                                    />}
                             </Card.Section>
                             <Group justify="space-between" mt="md" mb="xs" align='left'>
                                 {(e.status == 'Em dia') ?
