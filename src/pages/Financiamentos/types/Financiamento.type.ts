@@ -5,5 +5,6 @@ export type FinanciamentoProps = {
     status: string;
     parcelas_pagas: number;
     parcelas: ParcelaProps[];
+    img_string: string;
     objeto: string;
 }
