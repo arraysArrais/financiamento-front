@@ -12,14 +12,14 @@ export const Home = () => {
             {/*  <Notification color="violet" title="Seja bem vindo!" onClose={() => notifications.clean()}>
                 You are now obligated to give a star to Mantine project on GitHub
             </Notification> */}
-            <Button onClick={() =>
+            {/* <Button onClick={() =>
                 notifications.show({
                     title: 'Default notification',
                     message: 'Hey there, your code is awesome! 🤥',
                 })
             }>
                 Teste de notificação
-            </Button>
+            </Button> */}
             <div className={classes.inner}>
                 <div className={classes.content}>
                     <Title className={classes.title}>

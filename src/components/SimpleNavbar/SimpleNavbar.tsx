@@ -1,15 +1,10 @@
 import { useState } from 'react';
-import { Center, Tooltip, UnstyledButton, Stack, rem } from '@mantine/core';
+import { Tooltip, UnstyledButton, Stack, rem } from '@mantine/core';
 import {
     IconHome2,
-    IconGauge,
-    IconDeviceDesktopAnalytics,
-    IconFingerprint,
-    IconCalendarStats,
-    IconUser,
-    IconSettings,
     IconLogout,
-    IconSwitchHorizontal,
+    IconPigMoney,
+    IconPlus,
 } from '@tabler/icons-react';
 import classes from './NavbarMinimal.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -32,14 +27,14 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 }
 
 const mockdata = [
-    { icon: IconHome2, label: 'Home' , link: '/'},
-    //{ icon: IconGauge, label: 'Dashboard' },
-    { icon: IconDeviceDesktopAnalytics, label: 'Financiamentos', link: '/financiamentos' },
-    { icon: IconCalendarStats, label: 'Releases', link: '/financiamentos' },
-    { icon: IconUser, label: 'Account', link: '/financiamentos' },
-    { icon: IconFingerprint, label: 'Security', link: '/financiamentos' },
-    { icon: IconSettings, label: 'Settings', link: '/financiamentos' },
+    { icon: IconHome2, label: 'Home', link: '/' },
+    { icon: IconPigMoney, label: 'Listar financiamentos', link: '/financiamentos' },
+    { icon: IconPlus, label: 'Criar financiamento', link: '/add' },
 ];
+
+const logoutSection = [
+    { icon: IconLogout, label: 'Logout', link: '/logout' },
+]
 
 export const SimpleNavbar = () => {
     const [active, setActive] = useState(2);
@@ -55,21 +50,28 @@ export const SimpleNavbar = () => {
             }}
         />
     ));
+    const logoutLinks = logoutSection.map((e, index) => (
+        <NavbarLink
+            {...e}
+            key={e.label}
+            active={index === active}
+            onClick={() => {
+                setActive(index)
+                localStorage.removeItem('token')
+                navigate("/login")
+            }}
+        />
+    ))
 
     return (
         <nav className={classes.navbar}>
-  {/*           <Center>
-                <MantineLogo type="mark" size={30} />
-            </Center> */}
-
             <div className={classes.navbarMain}>
                 <Stack justify="center" gap={0}>
                     {links}
                 </Stack>
             </div>
                 <Stack justify="center" gap={0}>
-                    <NavbarLink icon={IconSwitchHorizontal} label="Change account" />
-                    <NavbarLink icon={IconLogout} label="Logout" />
+                    {logoutLinks}
                 </Stack>
         </nav>
     );

@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import './App.css'
+//import './App.css'
 import '@mantine/notifications/styles.css';
 import '@mantine/core/styles.css';
 import { BackgroundImage, MantineColorsTuple, MantineProvider, createTheme } from '@mantine/core';
 import { MainRoutes } from './routes/MainRoutes';
 import { Notifications } from '@mantine/notifications';
-
+import { ModalsProvider } from '@mantine/modals';
 const myColor: MantineColorsTuple = [
   '#f3edff',
   '#e0d7fa',
@@ -24,13 +24,22 @@ const theme = createTheme({
     myColor,
   },
   primaryColor: 'indigo',
+  breakpoints: {
+    xs: '500',
+    sm: '800',
+    md: '1000',
+    lg: '1200',
+    xl: '1400',
+  },
 });
 
 function App() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
-      <Notifications/>
+      <ModalsProvider>
+        <Notifications />
         <MainRoutes />
+      </ModalsProvider>
     </MantineProvider>
   )
 }
