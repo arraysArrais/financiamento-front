@@ -37,7 +37,8 @@ const logoutSection = [
 ]
 
 export const SimpleNavbar = () => {
-    const [active, setActive] = useState(2);
+    const [active, setActive] = useState(0);
+    const [activeBottom, setActiveBottom] = useState(1);
     const navigate = useNavigate();
     const links = mockdata.map((e, index) => (
         <NavbarLink
@@ -54,9 +55,9 @@ export const SimpleNavbar = () => {
         <NavbarLink
             {...e}
             key={e.label}
-            active={index === active}
+            active={index === activeBottom}
             onClick={() => {
-                setActive(index)
+                setActiveBottom(index)
                 localStorage.removeItem('token')
                 navigate("/login")
             }}
