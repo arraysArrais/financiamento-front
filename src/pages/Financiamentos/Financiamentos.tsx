@@ -1,5 +1,5 @@
 import './style.css'
-import { Text, Card, Image, Badge, Button, Group, Modal, Table, Flex } from '@mantine/core';
+import { Text, Card, Image, Badge, Button, Group, Modal, Table, Flex, Loader } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { WalkLoading } from '../../components/Loadings/WalkLoading/WalkLoading';
 import useApi from "../../services/financiamentoService"
@@ -17,8 +17,9 @@ export const Financiamentos = () => {
     const apiServices = useApi();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<FinanciamentoProps[]>([]);
-    const [opened, { open, close }] = useDisclosure(false);
+    const [opened, { open, close }] = useDisclosure(false); //modal
     const [parcelaData, setParcelaData] = useState<Parcela[]>([]);
+    const [parcelasLoading, setParcelasLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,13 +33,8 @@ export const Financiamentos = () => {
             }, 2000)
         }
 
-        const fetchParcelamento = async () => {
-            var result = await apiServices.getParcelas();
 
-            setParcelaData(result)
-        }
         fetchData();
-        fetchParcelamento();
     }, []);
 
     const openDeleteModal = () =>
@@ -64,13 +60,30 @@ export const Financiamentos = () => {
                 })
             },
         });
+
+    const openParcela = async (financiamento_id: number) => {
+        open(); // abre o modal
+        setParcelasLoading(true);
+
+        try {
+            const result = await apiServices.getParcelas(financiamento_id);
+            setParcelaData(result);
+        } catch (error) {
+            console.log('Erro ao buscar parcelas do financiamento ' + financiamento_id)
+        } finally {
+            setTimeout(() => {
+                setParcelasLoading(false);
+            }, 500);
+            
+        }
+    };
+
     return (
         loading ? <WalkLoading /> : (
-
             <Group justify='center'>
                 <Modal opened={opened} onClose={close} title="Parcelas" size={'md'} centered>
-                    <ParcelaTable data={parcelaData}
-                    />
+                    {parcelasLoading ? <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group> : <ParcelaTable data={parcelaData} />}
+                    {/* {parcelaData.length > 0 ? <ParcelaTable data={parcelaData} /> : <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group>} */}
                 </Modal>
                 <>
                     {data.map((e) => (
@@ -105,7 +118,10 @@ export const Financiamentos = () => {
                             <Text size='xs' c="dimmed" /* truncate="end" */ lineClamp={2}>DESCRIÇÃO MOCKADA DESCRIÇÃO MOCKADA</Text>
                             <Group grow className='btns'>
                                 {/* <Button variant="light" color="blue" fullWidth mt="md" radius="md" className='cardBtn' onClick={open}>Y</Button> */}
-                                <Button /* className='btn' */ variant='light' onClick={open}><IconEye size={16} /></Button>
+                                <Button /* className='btn' */ variant='light' onClick={() => {
+                                    setParcelaData([]) //esvazia state para evitar efeitos indesejados
+                                    openParcela(e.id)
+                                }}><IconEye size={16} /></Button>
                                 <Button /* className='btn' */ variant='light' onClick={openDeleteModal} color="red"><IconTrash size={16} /></Button>
                                 <Button /* className='btn' */ variant='light' color="yellow"><IconPencil size={16} /></Button>
                             </Group>

@@ -31,9 +31,9 @@ export default () => {
         getFinanciamentos: async () => {
             return request('get', '/api/financiamento', {}, localStorage.getItem('token'))
         },
-        getParcelas: async () => {
-            return await request('get', '/api/financiamento/parcelas/1', {}, localStorage.getItem('token'))
-        }
+        getParcelas: async (financiamento_id: number) => {
+            return await request('get', `/api/financiamento/parcelas/${financiamento_id}`, {}, localStorage.getItem('token'))
+        },
     }
 
 }

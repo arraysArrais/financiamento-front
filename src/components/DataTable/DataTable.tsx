@@ -7,7 +7,7 @@ import { IconTrash, IconCheck, IconPencil } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 12;
 
 export default function ParcelaTable({ data }: { data: Parcela[] }) {
   const [page, setPage] = useState(1);
