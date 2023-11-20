@@ -1,15 +1,15 @@
 const baseUrl = 'http://localhost:3000';
 
-const request = async(method: string, endpoint: string, params: any, token: string | null = null) =>{
+const request = async (method: string, endpoint: string, params: any, token: string | null = null) => {
     method = method.toLowerCase();
-    let fullUrl = baseUrl+endpoint;
+    let fullUrl = baseUrl + endpoint;
     let body = null;
 
-    if(method === 'get'){
+    if (method === 'get') {
         let queryString = new URLSearchParams(params).toString();
-        fullUrl += '?'+queryString;
+        fullUrl += '?' + queryString;
     }
-    else{
+    else {
         body = JSON.stringify(params);
     }
 
@@ -18,19 +18,22 @@ const request = async(method: string, endpoint: string, params: any, token: stri
         'Accept': 'application/json'
     } as any;
 
-    if(token){
-        headers['Authorization'] = 'Bearer '+token
+    if (token) {
+        headers['Authorization'] = 'Bearer ' + token
     }
 
-    let req = await fetch(fullUrl, {method, headers, body});
+    let req = await fetch(fullUrl, { method, headers, body });
     return await req.json();
 }
 
-export default() => {
-    return{
-        getFinanciamentos: async() => {
+export default () => {
+    return {
+        getFinanciamentos: async () => {
             return request('get', '/api/financiamento', {}, localStorage.getItem('token'))
+        },
+        getParcelas: async () => {
+            return await request('get', '/api/financiamento/parcelas/1', {}, localStorage.getItem('token'))
         }
     }
-    
+
 }
