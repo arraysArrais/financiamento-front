@@ -2,8 +2,8 @@ import { DataTable } from 'mantine-datatable';
 import dayjs from 'dayjs';
 import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
-import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem } from '@mantine/core';
-import { IconTrash, IconCheck, IconPencil, IconPhoto } from '@tabler/icons-react';
+import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image } from '@mantine/core';
+import { IconTrash, IconCheck, IconPencil, IconPhoto, IconEye } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
 import { useDisclosure } from '@mantine/hooks';
@@ -19,12 +19,17 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
   const [file, setFile] = useState<File | null>(null);
 
   const [baixaFaturaModal, { open: openBaixaFaturaModal, close: closeBaixaFaturaModal }] = useDisclosure(false); //modal baixa de parcela
+  const [viewComprovanteModal, { open: openComprovanteModal, close: closeComprovanteModal }] = useDisclosure(false); //modal comprovante
 
   const [baixaParcelaId, setBaixaParcelaId] = useState<number | null>(null);
 
   const [baixaParcelaModalLoading, setBaixaParcelaModalLoading] = useState(false);
 
   const apiServices = useApi();
+
+  const [comprovateImgString, setComprovateImgString] = useState('');
+  const [tipoComprovante, setTipoComprovante] = useState('');
+
 
   useEffect(() => {
     const from = (page - 1) * PAGE_SIZE;
@@ -64,6 +69,14 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
     });
   };
 
+  const handleViewComprovanteAction = async (parcela_id: number) => {
+    let result = await apiServices.getComprovante(parcela_id);
+
+    openComprovanteModal()
+    setComprovateImgString(result.comprovante_string)
+    setTipoComprovante(result.comprovante_tipo)
+  }
+
   return (
     <div>
       <Modal opened={baixaFaturaModal} onClose={closeBaixaFaturaModal} title="Anexar comprovante" size={'md'} centered>
@@ -88,6 +101,17 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
             </Stack >
           </form>
         </div>
+      </Modal>
+
+      <Modal opened={viewComprovanteModal} onClose={closeComprovanteModal} title="Comprovante" size={'md'} centered>
+        {/* src={`data:${comprovateImgString};base64,${tipoComprovante}`}
+          height={160} */}
+
+        <Image
+          src={`data:${tipoComprovante};base64,${comprovateImgString}`}
+          height={720}
+          fit='cover'
+        />
       </Modal>
       <DataTable
         height={300}
@@ -128,6 +152,15 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
                 >
                   <IconPencil size={16} />
                 </ActionIcon>
+                {element.status == 'Paga' ?
+                  <ActionIcon
+                    size="sm"
+                    variant="subtle"
+                    color="indigo"
+                    onClick={() => handleViewComprovanteAction(element.id)}
+                  >
+                    <IconPhoto size={16} />
+                  </ActionIcon> : <></>}
                 {/*               <ActionIcon
                   size="sm"
                   variant="subtle"

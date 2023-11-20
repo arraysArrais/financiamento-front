@@ -51,6 +51,9 @@ export default () => {
             } catch (error) {
                 console.error('Erro ao realizar baixa na fatura:', error);
             }
+        },
+        getComprovante: async(parcela_id: number) => {
+            return await request('get', `/api/financiamento/parcela/comprovante/${parcela_id}`, {}, localStorage.getItem('token'))
         }
     }
 
