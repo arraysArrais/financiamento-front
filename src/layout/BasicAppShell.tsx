@@ -1,11 +1,7 @@
-
-/* import { useDisclosure } from '@mantine/hooks'; */
 import { AppShell, Burger, Group, Image, Skeleton } from '@mantine/core';
-/* import { MantineLogo } from '@mantine/ds'; */
 import { SimpleNavbar } from '../components/SimpleNavbar/SimpleNavbar';
 import { useDisclosure } from '@mantine/hooks';
-import { MantineLogo } from '@mantine/ds';
-import Logo from './Logo.png'
+import './style.css'
 
 type Props = {
     children: JSX.Element
@@ -31,8 +27,6 @@ export const BasicAppShell = ({ children }: Props) => {
             <AppShell.Header>
                 <Group h="100%" px="md">
                     <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-
-                    {/* {<MantineLogo size={30} />} */}
                     <img width="30" height="30" src="https://img.icons8.com/officel/30/money-bag.png" alt="money-bag" style={{margin:10}}/><b>FinanceFlow</b>
                 </Group>
             </AppShell.Header>

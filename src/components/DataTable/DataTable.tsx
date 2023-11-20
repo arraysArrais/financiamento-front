@@ -7,7 +7,7 @@ import { IconTrash, IconCheck, IconPencil } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 5;
 
 export default function ParcelaTable({ data }: { data: Parcela[] }) {
   const [page, setPage] = useState(1);
@@ -49,7 +49,8 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
   return (
     <DataTable
       height={300}
-      withTableBorder
+      striped={true}
+      withTableBorder={true}
       records={records}
       columns={[
         {
