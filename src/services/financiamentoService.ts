@@ -34,6 +34,24 @@ export default () => {
         getParcelas: async (financiamento_id: number) => {
             return await request('get', `/api/financiamento/parcelas/${financiamento_id}`, {}, localStorage.getItem('token'))
         },
+        baixaFatura: async (parcela_id: number | null, file: any) => {
+            const formData = new FormData();
+            formData.append('img_comprovante', file);
+
+            try {
+                const response = await fetch(`${baseUrl}/api/financiamento/baixa_parcela/${parcela_id}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                return response.json();
+            } catch (error) {
+                console.error('Erro ao realizar baixa na fatura:', error);
+            }
+        }
     }
 
 }

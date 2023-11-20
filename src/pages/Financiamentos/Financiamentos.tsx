@@ -1,5 +1,5 @@
 import './style.css'
-import { Text, Card, Image, Badge, Button, Group, Modal, Table, Flex, Loader } from '@mantine/core';
+import { Text, Card, Image, Badge, Button, Group, Modal, Loader, } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { WalkLoading } from '../../components/Loadings/WalkLoading/WalkLoading';
 import useApi from "../../services/financiamentoService"
@@ -10,14 +10,13 @@ import { modals } from '@mantine/modals';
 import { IconTrash, IconEye, IconPencil } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications';
 import ParcelaTable from '../../components/DataTable/DataTable';
-//import { ParcelaProps } from './types/Parcelas.type';
 import { Parcela } from '../../components/DataTable/types/ParcelaProps'
 
 export const Financiamentos = () => {
     const apiServices = useApi();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<FinanciamentoProps[]>([]);
-    const [opened, { open, close }] = useDisclosure(false); //modal
+    const [parcelaModal, { open: openParcelaModal, close: closeParcelaModal }] = useDisclosure(false); //modal tabela de parcelas
     const [parcelaData, setParcelaData] = useState<Parcela[]>([]);
     const [parcelasLoading, setParcelasLoading] = useState(false);
 
@@ -32,8 +31,6 @@ export const Financiamentos = () => {
                 console.log(result)
             }, 2000)
         }
-
-
         fetchData();
     }, []);
 
@@ -62,7 +59,7 @@ export const Financiamentos = () => {
         });
 
     const openParcela = async (financiamento_id: number) => {
-        open(); // abre o modal
+        openParcelaModal() // abre o modal
         setParcelasLoading(true);
 
         try {
@@ -74,14 +71,14 @@ export const Financiamentos = () => {
             setTimeout(() => {
                 setParcelasLoading(false);
             }, 500);
-            
+
         }
     };
 
     return (
         loading ? <WalkLoading /> : (
             <Group justify='center'>
-                <Modal opened={opened} onClose={close} title="Parcelas" size={'md'} centered>
+                <Modal opened={parcelaModal} onClose={closeParcelaModal} title="Parcelas" size={'md'} centered>
                     {parcelasLoading ? <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group> : <ParcelaTable data={parcelaData} />}
                     {/* {parcelaData.length > 0 ? <ParcelaTable data={parcelaData} /> : <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group>} */}
                 </Modal>

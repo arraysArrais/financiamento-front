@@ -1,11 +1,13 @@
 import { DataTable } from 'mantine-datatable';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
-import { ActionIcon, Box, Group } from '@mantine/core';
-import { IconTrash, IconCheck, IconPencil } from '@tabler/icons-react';
+import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem } from '@mantine/core';
+import { IconTrash, IconCheck, IconPencil, IconPhoto } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
+import { useDisclosure } from '@mantine/hooks';
+import useApi from '../../services/financiamentoService';
 
 const PAGE_SIZE = 12;
 
@@ -13,25 +15,22 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
   const [page, setPage] = useState(1);
   const [records, setRecords] = useState(data.slice(0, PAGE_SIZE));
 
+  const icon = <IconPhoto style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
+  const [file, setFile] = useState<File | null>(null);
+
+  const [baixaFaturaModal, { open: openBaixaFaturaModal, close: closeBaixaFaturaModal }] = useDisclosure(false); //modal baixa de parcela
+
+  const [baixaParcelaId, setBaixaParcelaId] = useState<number | null>(null);
+
+  const [baixaParcelaModalLoading, setBaixaParcelaModalLoading] = useState(false);
+
+  const apiServices = useApi();
+
   useEffect(() => {
     const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE;
     setRecords(data.slice(from, to));
   }, [page]);
-
-  const handleBaixaAction = (id: number) => {
-
-    console.log('parcela id!!!', id)
-
-    //chamar serviço para dar baixa na fatura...
-    notifications.show({
-      title: 'Notificação',
-      message: 'Dando baixa na fatura...',
-      color: 'green',
-      //icon:
-      loading: true
-    })
-  }
 
   const handleEditAction = () => {
 
@@ -45,62 +44,106 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
     })
   }
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    setBaixaParcelaModalLoading(true)
+    event.preventDefault();
+    uploadFile(file)
+  }
+
+  const uploadFile = async (file: any) => {
+    var result = await apiServices.baixaFatura(baixaParcelaId, file); // TODO: jogar para fila
+    setBaixaParcelaModalLoading(false)
+    closeBaixaFaturaModal()
+
+    notifications.show({
+      title: 'Notificação',
+      message: (result.message) ? result.message : 'Erro. Contate o administrador',
+      color: (result.message) ? 'green' : 'red',
+      //icon:
+      loading: false
+    });
+  };
 
   return (
-    <DataTable
-      height={300}
-      striped={true}
-      withTableBorder={true}
-      records={records}
-      columns={[
-        {
-          accessor: 'data_vencimento',
-          textAlign: 'right',
-          width: 120,
-          render: ({ data_vencimento }) => dayjs(data_vencimento).format('DD/MM/YYYY'),
-
-        },
-        { accessor: 'valor', width: 100 },
-        { accessor: 'status', width: 100 },
-        {
-          accessor: 'actions',
-          title: <Box mr={6}>Ações</Box>,
-          textAlign: 'right',
-          render: (element) => (
-            <Group gap={4} justify="left" wrap="nowrap">
-              <ActionIcon
-                size="sm"
-                variant="subtle"
-                color="green"
-                onClick={() => handleBaixaAction(element.id)}
-              >
-                <IconCheck size={16} />
-              </ActionIcon>
-              <ActionIcon
-                size="sm"
-                variant="subtle"
-                color="yellow"
-                onClick={() => handleEditAction()}
-              >
-                <IconPencil size={16} />
-              </ActionIcon>
-              {/*               <ActionIcon
-                size="sm"
-                variant="subtle"
-                color="pink"
-                onClick={() => alert('clicou!')}
-              >
-                <IconTrash size={16} />
-              </ActionIcon> */}
-            </Group>
-          ),
-        },
-      ]}
-      totalRecords={data.length}
-      recordsPerPage={PAGE_SIZE}
-      page={page}
-      onPageChange={(p) => setPage(p)}
-
+    <div>
+      <Modal opened={baixaFaturaModal} onClose={closeBaixaFaturaModal} title="Anexar comprovante" size={'md'} centered>
+        <div className='fileInput'>
+          <form onSubmit={handleSubmit}>
+            <Stack justify='center'>
+              <FileInput
+                size="xs"
+                label="Comprovante"
+                withAsterisk
+                //error="É preciso inserir um comprovante de pagamento do boleto"
+                placeholder="Selecione o comprovante"
+                accept='image/png,image/jpeg'
+                rightSection={icon}
+                onChange={setFile}
+                value={file}
+              />
+              {/* <input type='file' ref={fileInputRef}/> */}
+              <Group justify='center'>
+                {baixaParcelaModalLoading ? <Loader /> : <Button type='submit'>Enviar</Button>}
+              </Group>
+            </Stack >
+          </form>
+        </div>
+      </Modal>
+      <DataTable
+        height={300}
+        striped={true}
+        withTableBorder={true}
+        records={records}
+        columns={[
+          {
+            accessor: 'data_vencimento',
+            textAlign: 'right',
+            width: 120,
+            render: ({ data_vencimento }) => dayjs(data_vencimento).format('DD/MM/YYYY'),
+          },
+          { accessor: 'valor', width: 100 },
+          { accessor: 'status', width: 100 },
+          {
+            accessor: 'actions',
+            title: <Box mr={6}>Ações</Box>,
+            textAlign: 'right',
+            render: (element) => (
+              <Group gap={4} justify="left" wrap="nowrap">
+                <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  color="green"
+                  onClick={() => {
+                    setBaixaParcelaId(element.id)
+                    openBaixaFaturaModal()
+                  }}
+                >
+                  <IconCheck size={16} />
+                </ActionIcon>
+                <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  color="yellow"
+                  onClick={() => handleEditAction()}
+                >
+                  <IconPencil size={16} />
+                </ActionIcon>
+                {/*               <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  color="pink"
+                  onClick={() => alert('clicou!')}
+                >
+                  <IconTrash size={16} />
+                </ActionIcon> */}
+              </Group>
+            ),
+          },
+        ]}
+        totalRecords={data.length}
+        recordsPerPage={PAGE_SIZE}
+        page={page}
+        onPageChange={(p) => setPage(p)}
       // 👇 uncomment the next line to use a custom pagination size
       //paginationSize="md"
       // 👇 uncomment the next line to use a custom loading text
@@ -113,6 +156,7 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
       // paginationActiveBackgroundColor="green"
       // paginationActiveTextColor="#e6e348"
       //emptyState={<></>}
-    />
+      />
+    </div>
   );
 }
