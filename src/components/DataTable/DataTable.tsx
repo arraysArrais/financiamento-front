@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
 import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image } from '@mantine/core';
-import { IconTrash, IconCheck, IconPencil, IconPhoto, IconEye } from '@tabler/icons-react';
+import { IconCheck, IconPencil, IconPhoto } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
 import { useDisclosure } from '@mantine/hooks';

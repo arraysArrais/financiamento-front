@@ -1,4 +1,4 @@
-import { AppShell, Burger, Group, Image, Skeleton } from '@mantine/core';
+import { AppShell, Burger, Group } from '@mantine/core';
 import { SimpleNavbar } from '../components/SimpleNavbar/SimpleNavbar';
 import { useDisclosure } from '@mantine/hooks';
 import './style.css'
