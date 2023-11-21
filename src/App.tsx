@@ -1,8 +1,7 @@
-import { useState } from 'react'
 //import './App.css'
 import '@mantine/notifications/styles.css';
 import '@mantine/core/styles.css';
-import { BackgroundImage, MantineColorsTuple, MantineProvider, createTheme } from '@mantine/core';
+import { MantineColorsTuple, MantineProvider, createTheme } from '@mantine/core';
 import { MainRoutes } from './routes/MainRoutes';
 import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
