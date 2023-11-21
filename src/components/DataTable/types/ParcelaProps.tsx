@@ -3,4 +3,5 @@ export type Parcela = {
     valor: string;
     data_vencimento: string;
     status: string;
+    closeParcelaModal: () => void;
   };

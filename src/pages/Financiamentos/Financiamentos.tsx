@@ -32,7 +32,7 @@ export const Financiamentos = () => {
             }, 2000)
         }
         fetchData();
-    }, []);
+    }, [data]);
 
     const openDeleteModal = () =>
         modals.openConfirmModal({
@@ -79,7 +79,7 @@ export const Financiamentos = () => {
         loading ? <WalkLoading /> : (
             <Group justify='center'>
                 <Modal opened={parcelaModal} onClose={closeParcelaModal} title="Parcelas" size={'md'} centered>
-                    {parcelasLoading ? <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group> : <ParcelaTable data={parcelaData} />}
+                    {parcelasLoading ? <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group> : <ParcelaTable data={parcelaData} closeParcelaModal={closeParcelaModal}/>}
                     {/* {parcelaData.length > 0 ? <ParcelaTable data={parcelaData} /> : <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group>} */}
                 </Modal>
                 <>

@@ -9,9 +9,14 @@ import './style.css'
 import { useDisclosure } from '@mantine/hooks';
 import useApi from '../../services/financiamentoService';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 6;
 
-export default function ParcelaTable({ data }: { data: Parcela[] }) {
+interface ParcelaTableProps {
+  data: Parcela[];
+  closeParcelaModal: () => void; // This function is not related to Parcela properties
+}
+
+const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) => {
   const [page, setPage] = useState(1);
   const [records, setRecords] = useState(data.slice(0, PAGE_SIZE));
 
@@ -59,7 +64,7 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
     var result = await apiServices.baixaFatura(baixaParcelaId, file); // TODO: jogar para fila
     setBaixaParcelaModalLoading(false)
     closeBaixaFaturaModal()
-
+    closeParcelaModal()
     notifications.show({
       title: 'Notificação',
       message: (result.message) ? result.message : 'Erro. Contate o administrador',
@@ -104,9 +109,6 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
       </Modal>
 
       <Modal opened={viewComprovanteModal} onClose={closeComprovanteModal} title="Comprovante" size={'md'} centered>
-        {/* src={`data:${comprovateImgString};base64,${tipoComprovante}`}
-          height={160} */}
-
         <Image
           src={`data:${tipoComprovante};base64,${comprovateImgString}`}
           height={720}
@@ -133,7 +135,7 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
             textAlign: 'right',
             render: (element) => (
               <Group gap={4} justify="left" wrap="nowrap">
-                <ActionIcon
+                {element.status == 'Pendente' ? <ActionIcon
                   size="sm"
                   variant="subtle"
                   color="green"
@@ -144,6 +146,7 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
                 >
                   <IconCheck size={16} />
                 </ActionIcon>
+                  : <></>}
                 <ActionIcon
                   size="sm"
                   variant="subtle"
@@ -193,3 +196,5 @@ export default function ParcelaTable({ data }: { data: Parcela[] }) {
     </div>
   );
 }
+
+export default ParcelaTable;
