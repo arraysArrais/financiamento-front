@@ -1,4 +1,5 @@
-const baseUrl = 'http://localhost:3000';
+//const baseUrl = 'http://localhost:3000';
+const baseUrl = 'https://financiamento-api.fly.dev';
 
 const request = async (method: string, endpoint: string, params: any, token: string | null = null) => {
     method = method.toLowerCase();
