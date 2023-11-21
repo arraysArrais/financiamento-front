@@ -112,7 +112,7 @@ export const Financiamentos = () => {
                                 </Badge>
                                 <Text fw={500} lineClamp={1} size='md'>{e.objeto}</Text>
                             </Group>
-                            <Text size='xs' c="dimmed" /* truncate="end" */ lineClamp={2}>DESCRIÇÃO MOCKADA DESCRIÇÃO MOCKADA</Text>
+                            <Text size='xs' c="dimmed" /* truncate="end" */ lineClamp={2}>DESCRIÇÃO MOCKADA! DESCRIÇÃO MOCKADA</Text>
                             <Group grow className='btns'>
                                 {/* <Button variant="light" color="blue" fullWidth mt="md" radius="md" className='cardBtn' onClick={open}>Y</Button> */}
                                 <Button /* className='btn' */ variant='light' onClick={() => {
