@@ -1,4 +1,4 @@
-import { Box, Button, FileInput, Flex, Group, Stack, Text, TextInput, Title, rem } from "@mantine/core"
+import { Box, Button, FileInput, Group, Stack, Text, TextInput, Title, rem } from "@mantine/core"
 import { /* FormEvent, useEffect, */ useState } from 'react';
 import { NumberInput, Slider } from '@mantine/core';
 import classes from './SliderInput.module.css';
