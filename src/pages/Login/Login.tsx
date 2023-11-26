@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './style.css'; //excluir para o modal funcionar
 import { z } from 'zod';
+import { notifications } from '@mantine/notifications';
 
 const schema = z.object({
   email: z.string().email({ message: 'E-mail inválido' }),
@@ -42,6 +43,14 @@ export function Login(props: PaperProps) {
     setIsLoading(true);
     let loginResponse = await authApi.login(emailInput, passwordInput);
     setIsLoading(false);
+
+    if(loginResponse.statusCode){
+      notifications.show({
+        title: 'Login',
+        message: 'Credenciais de acesso inválidas',
+        color: 'red',
+      })
+    }
     console.log(loginResponse)
     navigate('/')
   }
