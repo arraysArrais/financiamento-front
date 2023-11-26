@@ -2,7 +2,7 @@ import { DataTable } from 'mantine-datatable';
 import dayjs from 'dayjs';
 import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
-import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image } from '@mantine/core';
+import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text } from '@mantine/core';
 import { IconCheck, IconPencil, IconPhoto } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
@@ -34,6 +34,20 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
 
   const [comprovateImgString, setComprovateImgString] = useState('');
   const [tipoComprovante, setTipoComprovante] = useState('');
+
+  console.log("PARCELAS!!", data)
+  let valorPago = data.reduce((totalizador, prox) => {
+    if (prox.status == 'Paga'){
+      totalizador += +prox.valor;
+    }
+    return totalizador;
+  }, 0);
+
+  let valorTotal = data.reduce((totalizador, prox) => {
+    totalizador += +prox.valor
+
+    return totalizador
+  }, 0);
 
 
   useEffect(() => {
@@ -193,6 +207,18 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
       // paginationActiveTextColor="#e6e348"
       //emptyState={<></>}
       />
+
+      <div className='progress'>
+        <Card withBorder radius="md" padding="xl" bg="var(--mantine-color-body)">
+          <Text fz="xs" tt="uppercase" fw={700} c="dimmed">
+            Progresso
+          </Text>
+          <Text fz="lg" fw={500}>
+            R$ {valorPago.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2, useGrouping: false })} / R$ {valorTotal.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2, useGrouping: false })}
+          </Text>
+          <Progress value={(valorPago / valorTotal) * 100} mt="md" size="md" radius="md" />
+        </Card>
+      </div>
     </div>
   );
 }
