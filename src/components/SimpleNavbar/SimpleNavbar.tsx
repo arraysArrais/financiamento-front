@@ -29,7 +29,7 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 const mockdata = [
     { icon: IconHome2, label: 'Home', link: '/' },
     { icon: IconPigMoney, label: 'Listar financiamentos', link: '/financiamentos' },
-    { icon: IconPlus, label: 'Criar financiamento', link: '/add' },
+    { icon: IconPlus, label: 'Criar financiamento', link: '/financiamentos/add' },
 ];
 
 const logoutSection = [

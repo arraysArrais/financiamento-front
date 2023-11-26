@@ -64,6 +64,25 @@ export default () => {
         },
         deleteFinanciamento: async (financiamento_id: number) => {
             return await request('DELETE', `/api/financiamento/${financiamento_id}`, {}, localStorage.getItem('token'))
+        },
+        createFinanciamento: async(financiamento: any) =>{
+            const formData = new FormData();
+            for (let key in financiamento) {
+                formData.append(key, financiamento[key]);
+              }
+              try {
+                const response = await fetch(`${baseUrl}/api/financiamento/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                return response.json();
+            } catch (error) {
+                console.error('Erro ao criar financiamento:', error);
+            }
         }
     }
 

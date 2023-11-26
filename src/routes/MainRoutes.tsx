@@ -8,6 +8,7 @@ import { NotFound } from '../pages/NotFound/NotFound'
 import { BasicAppShell } from '../layout/BasicAppShell'
 import { Financiamentos } from '../pages/Financiamentos/Financiamentos'
 import { RedirectLogin } from './RedirectLogin'
+import { AddFinanciamento } from '../pages/Add-Financiamento/AddFinanciamento'
 
 
 export const MainRoutes = () => {
@@ -21,6 +22,10 @@ export const MainRoutes = () => {
       {
         path: "/financiamentos",
         element:<ProtectRoute><BasicAppShell><Financiamentos/></BasicAppShell></ProtectRoute>
+      },
+      {
+        path: "/financiamentos/add",
+        element: <ProtectRoute><BasicAppShell><AddFinanciamento/></BasicAppShell></ProtectRoute>
       },
       {
         path: "/Login",
