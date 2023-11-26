@@ -42,9 +42,12 @@ export const Financiamentos = () => {
         const fetchData = async () => {
             var result = await apiServices.getFinanciamentos()
             setTimeout(async () => {
-                if (result) {
+                if (!result.error) {
                     setLoading(false)
                     setData(result)
+                }
+                else{
+                    setLoading(false)
                 }
                 console.log(result)
             }, 2000)
@@ -156,7 +159,9 @@ export const Financiamentos = () => {
                     {/* {parcelaData.length > 0 ? <ParcelaTable data={parcelaData} /> : <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group>} */}
                 </Modal>
                 <>
-                    {data.map((e) => (
+                    {data.length === 0 ? (
+                            <Text size={'md'}>Sem financiamentos para exibir</Text>
+                    ) : data.map((e) => (
                         <Card shadow="sm" padding="lg" radius="md" className='cardFinanciamento' withBorder key={e.id}>
                             <Card.Section>
                                 {(e.img_string !== 'N/A')
