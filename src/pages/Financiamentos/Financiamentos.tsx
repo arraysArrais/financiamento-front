@@ -27,7 +27,7 @@ export const Financiamentos = () => {
 
     const schema = z.object({
         nome: z.string().min(20, { message: 'Nome deve ter pelo menos 20 caracteres' }),
-        descricao: z.string().min(50, { message: 'Descrição deve ter pelo menos 50 caracteres' }), 
+        descricao: z.string().min(50, { message: 'Descrição deve ter pelo menos 50 caracteres' }),
     });
 
     const form = useForm({
@@ -46,7 +46,7 @@ export const Financiamentos = () => {
                     setLoading(false)
                     setData(result)
                 }
-                else{
+                else {
                     setLoading(false)
                 }
                 console.log(result)
@@ -55,7 +55,7 @@ export const Financiamentos = () => {
         fetchData();
     }, [data]);
 
-    const openDeleteModal = () =>
+    const openDeleteModal = (financiamento_id: number) =>
         modals.openConfirmModal({
             title: 'Excluir financiamento',
             centered: true,
@@ -67,15 +67,19 @@ export const Financiamentos = () => {
             labels: { confirm: 'Sim', cancel: "Não" },
             confirmProps: { color: 'red' },
             onCancel: () => console.log('Cancel'),
-            onConfirm: () => {
+            onConfirm: async () => {
+                let result = await apiServices.deleteFinanciamento(financiamento_id);
                 notifications.show({
                     title: 'Notificação',
-                    message: 'Excluindo financiamento',
-                    color: 'indigo',
-                    //icon:
-                    loading: true
-
+                    message: result.message,
+                    color: 'red',
+                    loading: false
                 })
+                if(result.message){
+                    setTimeout(() => {
+                        setData([])
+                    }, 2500);
+                }
             },
         });
 
@@ -137,30 +141,30 @@ export const Financiamentos = () => {
                     {/* {parcelaData.length > 0 ? <ParcelaTable data={parcelaData} /> : <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group>} */}
                 </Modal>
                 <Modal opened={editFinanciamentoModal} onClose={closeEditModal} title="Editar financiamento" size={'md'} centered>
-                        <div>
-                            <form onSubmit={form.onSubmit(editFinancimanentoAction)}>
-                                <TextInput label="Nome" placeholder='Insira um nome legal' value={form.values.nome} onChange={(e) => {
-                                    const updatedValue = e.currentTarget.value;
-                                    const updatedEditFinanciamento = { ...editFinanciamento, objeto: updatedValue };
-                                    form.setFieldValue('nome', e.currentTarget.value)
-                                    setEditFinanciamento(updatedEditFinanciamento);
-                                }} error={form.errors.nome} />
-                                <br />
-                                <TextInput label="Descrição" placeholder='Descreva o objeto com detalhes (ou não)' value={form.values.descricao} onChange={(e) => {
-                                    const updatedValue = e.currentTarget.value;
-                                    const updatedEditFinanciamento = { ...editFinanciamento, descricao: updatedValue };
-                                    form.setFieldValue('descricao', e.currentTarget.value)
-                                    setEditFinanciamento(updatedEditFinanciamento);
-                                }} error={form.errors.descricao} />
-                                <br />
-                                <Button color='orange' type='submit'>Editar</Button>
-                            </form>
-                        </div>
+                    <div>
+                        <form onSubmit={form.onSubmit(editFinancimanentoAction)}>
+                            <TextInput label="Nome" placeholder='Insira um nome legal' value={form.values.nome} onChange={(e) => {
+                                const updatedValue = e.currentTarget.value;
+                                const updatedEditFinanciamento = { ...editFinanciamento, objeto: updatedValue };
+                                form.setFieldValue('nome', e.currentTarget.value)
+                                setEditFinanciamento(updatedEditFinanciamento);
+                            }} error={form.errors.nome} />
+                            <br />
+                            <TextInput label="Descrição" placeholder='Descreva o objeto com detalhes (ou não)' value={form.values.descricao} onChange={(e) => {
+                                const updatedValue = e.currentTarget.value;
+                                const updatedEditFinanciamento = { ...editFinanciamento, descricao: updatedValue };
+                                form.setFieldValue('descricao', e.currentTarget.value)
+                                setEditFinanciamento(updatedEditFinanciamento);
+                            }} error={form.errors.descricao} />
+                            <br />
+                            <Button color='orange' type='submit'>Editar</Button>
+                        </form>
+                    </div>
                     {/* {parcelaData.length > 0 ? <ParcelaTable data={parcelaData} /> : <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group>} */}
                 </Modal>
                 <>
                     {data.length === 0 ? (
-                            <Text size={'md'}>Sem financiamentos para exibir</Text>
+                        <Text size={'md'}>Sem financiamentos para exibir</Text>
                     ) : data.map((e) => (
                         <Card shadow="sm" padding="lg" radius="md" className='cardFinanciamento' withBorder key={e.id}>
                             <Card.Section>
@@ -197,7 +201,7 @@ export const Financiamentos = () => {
                                     setParcelaData([]) //esvazia state para evitar efeitos indesejados
                                     openParcela(e.id)
                                 }}><IconEye size={16} /></Button>
-                                <Button /* className='btn' */ variant='light' onClick={openDeleteModal} color="red"><IconTrash size={16} /></Button>
+                                <Button /* className='btn' */ variant='light' onClick={() => { openDeleteModal(e.id) }} color="red"><IconTrash size={16} /></Button>
                                 <Button /* className='btn' */ variant='light' onClick={() => { handleEditFinanciamento(e.id) }} color="yellow"><IconPencil size={16} /></Button>
                             </Group>
                         </Card>

@@ -61,6 +61,9 @@ export default () => {
         },
         updateFinanciamento: async (financiamento_id: number, body: any) => {
             return await request('PATCH', `/api/financiamento/${financiamento_id}`, body, localStorage.getItem('token'))
+        },
+        deleteFinanciamento: async (financiamento_id: number) => {
+            return await request('DELETE', `/api/financiamento/${financiamento_id}`, {}, localStorage.getItem('token'))
         }
     }
 
