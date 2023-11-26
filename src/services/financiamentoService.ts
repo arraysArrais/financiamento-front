@@ -16,6 +16,7 @@ const request = async (method: string, endpoint: string, params: any, token: str
         body = JSON.stringify(params);
     }
 
+    method = method.toUpperCase();
     let headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -59,7 +60,7 @@ export default () => {
             return await request('get', `/api/financiamento/parcela/comprovante/${parcela_id}`, {}, localStorage.getItem('token'))
         },
         updateFinanciamento: async (financiamento_id: number, body: any) => {
-            return await request('patch', `/api/financiamento/${financiamento_id}`, body, localStorage.getItem('token'))
+            return await request('PATCH', `/api/financiamento/${financiamento_id}`, body, localStorage.getItem('token'))
         }
     }
 

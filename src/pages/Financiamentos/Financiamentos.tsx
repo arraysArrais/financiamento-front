@@ -19,7 +19,7 @@ export const Financiamentos = () => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<FinanciamentoProps[]>([]);
     const [parcelaModal, { open: openParcelaModal, close: closeParcelaModal }] = useDisclosure(false); //modal tabela de parcelas
-    const [editFinanciamentoModal, { open: OpenEditModal, close: closeEditModal }] = useDisclosure(false); //modal de edição
+    const [editFinanciamentoModal, { open: openEditModal, close: closeEditModal }] = useDisclosure(false); //modal de edição
     const [parcelaData, setParcelaData] = useState<Parcela[]>([]);
     const [parcelasLoading, setParcelasLoading] = useState(false);
     //const [editLoading, setEditLoading] = useState(false);
@@ -27,7 +27,7 @@ export const Financiamentos = () => {
 
     const schema = z.object({
         nome: z.string().min(20, { message: 'Nome deve ter pelo menos 20 caracteres' }),
-        descricao: z.string().min(50, { message: 'Descrição deve ter pelo menos 50 caracteres' }),
+        descricao: z.string().min(50, { message: 'Descrição deve ter pelo menos 50 caracteres' }), 
     });
 
     const form = useForm({
@@ -95,10 +95,11 @@ export const Financiamentos = () => {
 
     const handleEditFinanciamento = async (financiamento_id: number) => {
         setEditFinanciamento({ id: financiamento_id });
-        OpenEditModal()
+        openEditModal()
     }
 
     const editFinancimanentoAction = async () => {
+        closeEditModal()
         console.log("EDIT FINANCIAMENTO!!", editFinanciamento)
 
         const notificacao = notifications.show({
@@ -137,7 +138,7 @@ export const Financiamentos = () => {
                             <form onSubmit={form.onSubmit(editFinancimanentoAction)}>
                                 <TextInput label="Nome" placeholder='Insira um nome legal' value={form.values.nome} onChange={(e) => {
                                     const updatedValue = e.currentTarget.value;
-                                    const updatedEditFinanciamento = { ...editFinanciamento, nome: updatedValue };
+                                    const updatedEditFinanciamento = { ...editFinanciamento, objeto: updatedValue };
                                     form.setFieldValue('nome', e.currentTarget.value)
                                     setEditFinanciamento(updatedEditFinanciamento);
                                 }} error={form.errors.nome} />
