@@ -1,3 +1,5 @@
+
+
 //const baseUrl = 'http://localhost:3000';
 const baseUrl = 'https://financiamento-api.fly.dev';
 
@@ -53,8 +55,11 @@ export default () => {
                 console.error('Erro ao realizar baixa na fatura:', error);
             }
         },
-        getComprovante: async(parcela_id: number) => {
+        getComprovante: async (parcela_id: number) => {
             return await request('get', `/api/financiamento/parcela/comprovante/${parcela_id}`, {}, localStorage.getItem('token'))
+        },
+        updateFinanciamento: async (financiamento_id: number, body: any) => {
+            return await request('patch', `/api/financiamento/${financiamento_id}`, body, localStorage.getItem('token'))
         }
     }
 

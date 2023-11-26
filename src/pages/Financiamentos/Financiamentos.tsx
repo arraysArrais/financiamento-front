@@ -1,5 +1,5 @@
 import './style.css'
-import { Text, Card, Image, Badge, Button, Group, Modal, Loader, } from '@mantine/core';
+import { Text, Card, Image, Badge, Button, Group, Modal, Loader, TextInput, rem, } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { WalkLoading } from '../../components/Loadings/WalkLoading/WalkLoading';
 import useApi from "../../services/financiamentoService"
@@ -7,18 +7,36 @@ import { FinanciamentoProps } from './types/Financiamento.type';
 import ImagePlaceholder from '../../assets/image-placeholder.jpg'
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { IconTrash, IconEye, IconPencil } from '@tabler/icons-react'
+import { IconTrash, IconEye, IconPencil, IconCheck } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications';
 import ParcelaTable from '../../components/DataTable/DataTable';
 import { Parcela } from '../../components/DataTable/types/ParcelaProps'
+import { useForm, zodResolver } from '@mantine/form';
+import { z } from 'zod';
 
 export const Financiamentos = () => {
     const apiServices = useApi();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<FinanciamentoProps[]>([]);
     const [parcelaModal, { open: openParcelaModal, close: closeParcelaModal }] = useDisclosure(false); //modal tabela de parcelas
+    const [editFinanciamentoModal, { open: OpenEditModal, close: closeEditModal }] = useDisclosure(false); //modal de edição
     const [parcelaData, setParcelaData] = useState<Parcela[]>([]);
     const [parcelasLoading, setParcelasLoading] = useState(false);
+    //const [editLoading, setEditLoading] = useState(false);
+    const [editFinanciamento, setEditFinanciamento] = useState<any>({})
+
+    const schema = z.object({
+        nome: z.string().min(20, { message: 'Nome deve ter pelo menos 20 caracteres' }),
+        descricao: z.string().min(50, { message: 'Descrição deve ter pelo menos 50 caracteres' }),
+    });
+
+    const form = useForm({
+        validate: zodResolver(schema),
+        initialValues: {
+            nome: '',
+            descricao: '',
+        },
+    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -75,11 +93,65 @@ export const Financiamentos = () => {
         }
     };
 
+    const handleEditFinanciamento = async (financiamento_id: number) => {
+        setEditFinanciamento({ id: financiamento_id });
+        OpenEditModal()
+    }
+
+    const editFinancimanentoAction = async () => {
+        console.log("EDIT FINANCIAMENTO!!", editFinanciamento)
+
+        const notificacao = notifications.show({
+            loading: true,
+            title: 'Notificação',
+            message: 'Atualizando financiamento',
+            autoClose: false,
+            withCloseButton: false,
+            color: 'yellow'
+        });
+
+        let response = await apiServices.updateFinanciamento(editFinanciamento.id, editFinanciamento)
+
+        if (response) {
+            notifications.update({
+                id: notificacao,
+                color: 'yellow',
+                title: 'Operação finalizada',
+                message: response.message,
+                icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                loading: false,
+                autoClose: 2000,
+            });
+        }
+    }
+
     return (
         loading ? <WalkLoading /> : (
             <Group justify='center'>
                 <Modal opened={parcelaModal} onClose={closeParcelaModal} title="Parcelas" size={'md'} centered>
-                    {parcelasLoading ? <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group> : <ParcelaTable data={parcelaData} closeParcelaModal={closeParcelaModal}/>}
+                    {parcelasLoading ? <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group> : <ParcelaTable data={parcelaData} closeParcelaModal={closeParcelaModal} />}
+                    {/* {parcelaData.length > 0 ? <ParcelaTable data={parcelaData} /> : <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group>} */}
+                </Modal>
+                <Modal opened={editFinanciamentoModal} onClose={closeEditModal} title="Editar financiamento" size={'md'} centered>
+                        <div>
+                            <form onSubmit={form.onSubmit(editFinancimanentoAction)}>
+                                <TextInput label="Nome" placeholder='Insira um nome legal' value={form.values.nome} onChange={(e) => {
+                                    const updatedValue = e.currentTarget.value;
+                                    const updatedEditFinanciamento = { ...editFinanciamento, nome: updatedValue };
+                                    form.setFieldValue('nome', e.currentTarget.value)
+                                    setEditFinanciamento(updatedEditFinanciamento);
+                                }} error={form.errors.nome} />
+                                <br />
+                                <TextInput label="Descrição" placeholder='Descreva o objeto com detalhes (ou não)' value={form.values.descricao} onChange={(e) => {
+                                    const updatedValue = e.currentTarget.value;
+                                    const updatedEditFinanciamento = { ...editFinanciamento, descricao: updatedValue };
+                                    form.setFieldValue('descricao', e.currentTarget.value)
+                                    setEditFinanciamento(updatedEditFinanciamento);
+                                }} error={form.errors.descricao} />
+                                <br />
+                                <Button color='orange' type='submit'>Editar</Button>
+                            </form>
+                        </div>
                     {/* {parcelaData.length > 0 ? <ParcelaTable data={parcelaData} /> : <Group justify='center' style={{ padding: 10 }}><Loader color="violet" type="oval" /></Group>} */}
                 </Modal>
                 <>
@@ -120,7 +192,7 @@ export const Financiamentos = () => {
                                     openParcela(e.id)
                                 }}><IconEye size={16} /></Button>
                                 <Button /* className='btn' */ variant='light' onClick={openDeleteModal} color="red"><IconTrash size={16} /></Button>
-                                <Button /* className='btn' */ variant='light' color="yellow"><IconPencil size={16} /></Button>
+                                <Button /* className='btn' */ variant='light' onClick={() => { handleEditFinanciamento(e.id) }} color="yellow"><IconPencil size={16} /></Button>
                             </Group>
                         </Card>
                     ))}
