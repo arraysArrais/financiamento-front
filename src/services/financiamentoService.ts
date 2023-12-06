@@ -83,6 +83,9 @@ export default () => {
             } catch (error) {
                 console.error('Erro ao criar financiamento:', error);
             }
+        },
+        getUsers: async () =>{
+            return request('get', '/api/user', {}, localStorage.getItem('token'))
         }
     }
 

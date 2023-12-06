@@ -1,33 +1,33 @@
 import { Box, Button, FileInput, Group, Stack, TextInput, Title, rem } from "@mantine/core"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NumberInput } from '@mantine/core';
 //import classes from './SliderInput.module.css';
 import './style.css'
 import { useForm } from "@mantine/form";
-import { IconCalendar, IconCheck, IconPhoto } from "@tabler/icons-react";
+import { IconCalendar, IconCheck, IconCoin, IconPhoto, IconUser, Icon123, IconAbc} from "@tabler/icons-react";
 import useApi from '../../services/financiamentoService';
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from 'react-router-dom';
-import { DatePickerInput, DateValue } from '@mantine/dates';
+import { DatePickerInput } from '@mantine/dates';
 import '@mantine/dates/styles.css';
+import { Select } from '@mantine/core';
+import { UserProps } from "../Financiamentos/types/Users.type";
+import { FormProps } from "./types/AddFinanciamentoFormProps";
+
 
 
 export const AddFinanciamento = () => {
     const apiServices = useApi();
     const imgIcon = <IconPhoto style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
     const dateIcon = <IconCalendar style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
-    //const moneyIcon = <IconCoin style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
+    const userIcon = <IconUser style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
+    const moneyIcon = <IconCoin style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
+    const numberIcon =  <Icon123 style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
+    const letterIcon =  <IconAbc style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
     const [file, setFile] = useState<File | null>(null);
+    const [users, setUsers] = useState<UserProps[] | never[]>([]);
 
-    interface FormData {
-        objeto: string;
-        descricao: string;
-        vencimento_primeira_parcela: DateValue | undefined;
-        valor_parcela: number;
-        qtd_parcelas: number;
-        img_obj: File | null;
-    }
-    const form = useForm<FormData>({
+    const form = useForm<FormProps>({
         initialValues: {
             objeto: '',
             descricao: '',
@@ -35,17 +35,28 @@ export const AddFinanciamento = () => {
             valor_parcela: 0,
             qtd_parcelas: 0,
             img_obj: null,
-
+            pagador: '',
+            responsavel: ''
         },
         validate: {
-            objeto: (value) => value.length > 32 ? null : 'Nome do objeto precisa ter pelo menos 20 caracteres',
-            descricao: (value) => value.length > 20 ? null : 'Descricao do objeto precisa ter pelo menos 50 caracteres',
+            objeto: (value) => (value.length > 29 && value.length < 40) ? null : 'Nome do objeto precisa ter pelo menos 30 caracteres e no máximo 40',
+            descricao: (value) => value.length > 20 ? null : 'Descricao do objeto precisa ter pelo menos 20 caracteres',
             vencimento_primeira_parcela: (value) => (value !== undefined && value !== null) ? null : 'Deve ser preenchido uma data',
             qtd_parcelas: (value) => ((value <= 48) && (value !== undefined) && (!isNaN(value) && (value !== 0))) ? null : 'Este campo deve ser preenchido. O valor máximo é 48. Mais que isso tá passando necessidade.',
             valor_parcela: (value) => (value !== undefined && (!isNaN(value) && (value !== 0)) ? null : 'O valor da parcela precisa ser preenchido'),
-            img_obj: (value) => (value !== undefined && value !== null) ? null : 'O arquivo de imagem deve ser anexado.'
+            img_obj: (value) => (value !== undefined && value !== null) ? null : 'O arquivo de imagem deve ser anexado.',
+            pagador: (value) => (value !== undefined && value !== null) ? null : 'Favor selecionar um usuário responsável pelo pagamento das faturas',
+            responsavel: (value) => (value !== undefined && value !== null) ? null : 'Favor selecionar o usuário que cederá o nome para o financiamento'
         }
     });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            let response = await apiServices.getUsers();
+            setUsers(response);
+        }
+        fetchData();
+    }, [])
 
     const [numberInput, setNumberInput] = useState<number>(0);
     const [createFinanciamento, setCreateFinanciamento] = useState<any>({});
@@ -89,7 +100,7 @@ export const AddFinanciamento = () => {
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap={"lg"}>
                     <Title>Cadastrar novo financiamento</Title>
-                    <TextInput {...form.getInputProps('objeto')} label="Objeto" placeholder="Nome do objeto a ser financiado" name="objeto" value={form.values.objeto} onChange={(e) => {
+                    <TextInput {...form.getInputProps('objeto')} leftSection={letterIcon} label="Objeto" placeholder="Nome do objeto a ser financiado" name="objeto" value={form.values.objeto} onChange={(e) => {
                         const updatedValue = e.currentTarget.value;
                         const updatedEditFinanciamento = { ...createFinanciamento, objeto: updatedValue };
                         form.setFieldValue('objeto', e.currentTarget.value)
@@ -97,7 +108,7 @@ export const AddFinanciamento = () => {
                         console.log(createFinanciamento)
                     }}
                     />
-                    <TextInput {...form.getInputProps('descricao')} label="Descricao" placeholder="Descrição do objeto a ser financiado" name="descricao" value={form.values.descricao} onChange={(e) => {
+                    <TextInput {...form.getInputProps('descricao')} leftSection={letterIcon} label="Descrição" placeholder="Descrição do objeto a ser financiado" name="descricao" value={form.values.descricao} onChange={(e) => {
                         const updatedValue = e.currentTarget.value;
                         const updatedEditFinanciamento = { ...createFinanciamento, descricao: updatedValue };
                         form.setFieldValue('descricao', e.currentTarget.value)
@@ -130,8 +141,49 @@ export const AddFinanciamento = () => {
                                 console.log(createFinanciamento)
                             }}
                         />
-                    </Box>
 
+
+                    </Box>
+                    <Group>
+                        <Select
+                            {...form.getInputProps('responsavel')}
+                            label="Responsável"
+                            placeholder="Nome do responsável"
+                            data={users.map((user) => ({ value: user.id.toString(), label: user.fullname }))}
+                            value={form.values.responsavel}
+                            onChange={(e) => {
+                                form.setFieldValue('responsavel', e)
+                                let id;
+                                if (e) {
+                                    id = +e
+                                }
+                                const updatedEditFinanciamento = { ...createFinanciamento, id_responsavel: id };
+                                setCreateFinanciamento(updatedEditFinanciamento);
+                            }}
+                            searchable
+                            nothingFoundMessage="Responsável não encontrado"
+                            leftSection={userIcon}
+                        />
+                        <Select
+                            {...form.getInputProps('pagador')}
+                            label="Pagador"
+                            placeholder="Pagador das faturas"
+                            data={users.map((user) => ({ value: user.id.toString(), label: user.fullname }))}
+                            value={form.values.pagador}
+                            onChange={(e) => {
+                                form.setFieldValue('pagador', e)
+                                let id;
+                                if (e) {
+                                    id = +e
+                                }
+                                const updatedEditFinanciamento = { ...createFinanciamento, id_pagador: id };
+                                setCreateFinanciamento(updatedEditFinanciamento);
+                            }}
+                            searchable
+                            nothingFoundMessage="Pagador não encontrado"
+                            leftSection={userIcon}
+                        />
+                    </Group>
                     <NumberInput
                         {...form.getInputProps('qtd_parcelas')}
                         label="Quantidade de parcelas"
@@ -146,6 +198,7 @@ export const AddFinanciamento = () => {
                             form.setFieldValue('qtd_parcelas', updatedValue)
                             setCreateFinanciamento(updatedEditFinanciamento);
                         }}
+                        leftSection={numberIcon}
                     />
                     <NumberInput
                         {...form.getInputProps('valor_parcela')}
@@ -165,6 +218,7 @@ export const AddFinanciamento = () => {
                         fixedDecimalScale
                         decimalSeparator=","
                         hideControls
+                        leftSection={moneyIcon}
                     />
                     <FileInput
                         {...form.getInputProps('img_obj')}
