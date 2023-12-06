@@ -75,11 +75,6 @@ export const Financiamentos = () => {
                     color: 'red',
                     loading: false
                 })
-                if(result.message){
-                    setTimeout(() => {
-                        setData([])
-                    }, 2500);
-                }
             },
         });
 
