@@ -1,10 +1,10 @@
-import { Box, Button, FileInput, Group, Stack, TextInput, Title, rem } from "@mantine/core"
+import { Box, Button, FileInput, Group, Stack, Text, TextInput, Title, rem } from "@mantine/core"
 import { useEffect, useState } from 'react';
 import { NumberInput } from '@mantine/core';
 //import classes from './SliderInput.module.css';
 import './style.css'
 import { useForm } from "@mantine/form";
-import { IconCalendar, IconCheck, IconCoin, IconPhoto, IconUser, Icon123, IconAbc} from "@tabler/icons-react";
+import { IconCalendar, IconCheck, IconCoin, IconPhoto, IconUser, Icon123, IconAbc } from "@tabler/icons-react";
 import useApi from '../../services/financiamentoService';
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from 'react-router-dom';
@@ -22,8 +22,8 @@ export const AddFinanciamento = () => {
     const dateIcon = <IconCalendar style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
     const userIcon = <IconUser style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
     const moneyIcon = <IconCoin style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
-    const numberIcon =  <Icon123 style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
-    const letterIcon =  <IconAbc style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
+    const numberIcon = <Icon123 style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
+    const letterIcon = <IconAbc style={{ width: rem(18), height: rem(18) }} stroke={1.5} />;
     const [file, setFile] = useState<File | null>(null);
     const [users, setUsers] = useState<UserProps[] | never[]>([]);
 
@@ -223,9 +223,13 @@ export const AddFinanciamento = () => {
                         hideControls
                         leftSection={moneyIcon}
                     />
+                    <Text size="xs">
+                        Valor total do financiamento: R$ {(form.values.qtd_parcelas * form.values.valor_parcela).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </Text>
+
                     <FileInput
                         {...form.getInputProps('img_obj')}
-                        size="xs"
+                        size="sm"
                         label="Imagem"
                         //withAsterisk
                         //error="É preciso inserir um comprovante de pagamento do boleto"
