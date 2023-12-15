@@ -45,8 +45,8 @@ export const AddFinanciamento = () => {
             qtd_parcelas: (value) => ((value <= 48) && (value !== undefined) && (!isNaN(value) && (value !== 0))) ? null : 'Este campo deve ser preenchido. O valor máximo é 48. Mais que isso tá passando necessidade.',
             valor_parcela: (value) => (value !== undefined && (!isNaN(value) && (value !== 0)) ? null : 'O valor da parcela precisa ser preenchido'),
             img_obj: (value) => (value !== undefined && value !== null) ? null : 'O arquivo de imagem deve ser anexado.',
-            pagador: (value) => (value !== undefined && value !== null) ? null : 'Favor selecionar um usuário responsável pelo pagamento das faturas',
-            responsavel: (value) => (value !== undefined && value !== null) ? null : 'Favor selecionar o usuário que cederá o nome para o financiamento'
+            pagador: (value) => (value !== undefined && value !== null && value !== "") ? null : 'Favor selecionar um usuário responsável pelo pagamento das faturas',
+            responsavel: (value) => (value !== undefined && value !== null && value !== "") ? null : 'Favor selecionar o usuário que cederá o nome para o financiamento'
         }
     });
 
@@ -114,6 +114,7 @@ export const AddFinanciamento = () => {
                         form.setFieldValue('descricao', e.currentTarget.value)
                         setCreateFinanciamento(updatedEditFinanciamento);
                         console.log(createFinanciamento)
+                        console.log(form)
                     }} />
                     <Box>
                         {/* <input {...form.getInputProps('vencimento_primeira_parcela')} type='date' className="dataInput" name="vencimento_primeira_parcela" 
@@ -159,6 +160,8 @@ export const AddFinanciamento = () => {
                                 }
                                 const updatedEditFinanciamento = { ...createFinanciamento, id_responsavel: id };
                                 setCreateFinanciamento(updatedEditFinanciamento);
+                                console.log(updatedEditFinanciamento)
+                                console.log(form)
                             }}
                             searchable
                             nothingFoundMessage="Responsável não encontrado"
@@ -178,6 +181,7 @@ export const AddFinanciamento = () => {
                                 }
                                 const updatedEditFinanciamento = { ...createFinanciamento, id_pagador: id };
                                 setCreateFinanciamento(updatedEditFinanciamento);
+                                console.log(updatedEditFinanciamento)
                             }}
                             searchable
                             nothingFoundMessage="Pagador não encontrado"
@@ -209,7 +213,6 @@ export const AddFinanciamento = () => {
                             const updatedEditFinanciamento = { ...createFinanciamento, valor_parcela: +numberInput };
                             setCreateFinanciamento(updatedEditFinanciamento);
                             console.log(createFinanciamento)
-                            console.log("form:", form.values.valor_parcela)
                         }}
                         label="Valor da parcela"
                         prefix="R$ "
