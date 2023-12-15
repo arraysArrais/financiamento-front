@@ -125,7 +125,7 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
       <Modal opened={viewComprovanteModal} onClose={closeComprovanteModal} title="Comprovante" size={'md'} centered>
         <Image
           src={`data:${tipoComprovante};base64,${comprovateImgString}`}
-          height={720}
+          //height={720}
           fit='cover'
         />
       </Modal>
