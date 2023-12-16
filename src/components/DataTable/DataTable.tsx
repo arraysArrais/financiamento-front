@@ -130,7 +130,7 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
         />
       </Modal>
       <DataTable
-        //height={300}
+        height={320}
         striped={true}
         withTableBorder={true}
         records={records}
