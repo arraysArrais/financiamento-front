@@ -3,11 +3,12 @@ import dayjs from 'dayjs';
 import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
 import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text } from '@mantine/core';
-import { IconCheck, IconPencil, IconPhoto } from '@tabler/icons-react';
+import { IconCheck, IconPencil, IconPhoto, IconBarcode } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
 import { useDisclosure } from '@mantine/hooks';
 import useApi from '../../services/financiamentoService';
+import { Barcode } from '../../pages/Financiamentos/types/Barcode.type';
 
 const PAGE_SIZE = 6;
 
@@ -35,9 +36,12 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
   const [comprovateImgString, setComprovateImgString] = useState('');
   const [tipoComprovante, setTipoComprovante] = useState('');
 
+  const [barCodeModal, { open: openBarCodeModal, close: closeBarCodeModal }] = useDisclosure(false); //modal do código de barras
+  const [barCodeData, setBarCodeData] = useState<Barcode>()
+
   console.log("PARCELAS!!", data)
   let valorPago = data.reduce((totalizador, prox) => {
-    if (prox.status == 'Paga'){
+    if (prox.status == 'Paga') {
       totalizador += +prox.valor;
     }
     return totalizador;
@@ -96,6 +100,17 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
     setTipoComprovante(result.comprovante_tipo)
   }
 
+  const handleCodeBarAction = async(parcela_id: number) => {
+    openBarCodeModal() // abre o modal pra exibir o código de barras
+
+    try{
+      const result = await apiServices.getCodBarra(parcela_id);
+      setBarCodeData(result)
+    }catch(error){
+      console.log('Erro ao buscar código de barra da parcela ' + parcela_id)
+    }
+  }
+
   return (
     <div>
       <Modal opened={baixaFaturaModal} onClose={closeBaixaFaturaModal} title="Anexar comprovante" size={'md'} centered>
@@ -128,6 +143,10 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
           //height={720}
           fit='cover'
         />
+      </Modal>
+
+      <Modal opened={barCodeModal} onClose={closeBarCodeModal} title="Codigo de barras" size={'md'} centered>
+        <p>{barCodeData?.code}</p>
       </Modal>
       <DataTable
         height={320}
@@ -186,6 +205,15 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
                 >
                   <IconTrash size={16} />
                 </ActionIcon> */}
+                <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  color="blue"
+                  onClick={() => handleCodeBarAction(element.id)}
+                >
+
+                  <IconBarcode size={16} />
+                </ActionIcon>
               </Group>
             ),
           },

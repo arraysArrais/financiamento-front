@@ -86,6 +86,9 @@ export default () => {
         },
         getUsers: async () =>{
             return request('get', '/api/user', {}, localStorage.getItem('token'))
+        },
+        getCodBarra: async (parcela_id: number) => {
+            return request('get', `/api/financiamento/parcela/barcode/${parcela_id}`, {}, localStorage.getItem('token'))
         }
     }
 
