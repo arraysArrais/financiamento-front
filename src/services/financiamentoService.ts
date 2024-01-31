@@ -89,6 +89,9 @@ export default () => {
         },
         getCodBarra: async (parcela_id: number) => {
             return request('get', `/api/financiamento/parcela/barcode/${parcela_id}`, {}, localStorage.getItem('token'))
+        },
+        updateFatura: async(parcela_id: number, body: any) => {
+            return request('PATCH', `/api/financiamento/parcela/${parcela_id}`, body, localStorage.getItem('token'))
         }
     }
 
