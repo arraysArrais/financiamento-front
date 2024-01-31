@@ -2,7 +2,7 @@ import { DataTable } from 'mantine-datatable';
 import dayjs from 'dayjs';
 import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
-import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text } from '@mantine/core';
+import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text, TextInput } from '@mantine/core';
 import { IconCheck, IconPencil, IconPhoto, IconBarcode } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
@@ -37,7 +37,10 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
   const [tipoComprovante, setTipoComprovante] = useState('');
 
   const [barCodeModal, { open: openBarCodeModal, close: closeBarCodeModal }] = useDisclosure(false); //modal do código de barras
-  const [barCodeData, setBarCodeData] = useState<Barcode>()
+  const [barCodeData, setBarCodeData] = useState<Barcode | any>()
+
+  const [barCodeInputDisabled, setBarCodeInputDisabled] = useState(true)
+  const [barCodeActionBtnDisabled, setBarCodeActionBtnDisabled] = useState(true)
 
   console.log("PARCELAS!!", data)
   let valorPago = data.reduce((totalizador, prox) => {
@@ -100,15 +103,47 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
     setTipoComprovante(result.comprovante_tipo)
   }
 
-  const handleCodeBarAction = async(parcela_id: number) => {
+  const handleCodeBarAction = async (parcela_id: number) => {
     openBarCodeModal() // abre o modal pra exibir o código de barras
 
-    try{
+    try {
       const result = await apiServices.getCodBarra(parcela_id);
       setBarCodeData(result)
-    }catch(error){
+      console.log("VALOR DENTRO DO STATE DO CODIGO DE BARRA", barCodeData)
+    } catch (error) {
       console.log('Erro ao buscar código de barra da parcela ' + parcela_id)
     }
+  }
+
+  const handleEditBarCodeBtn = async () => {
+    //chamar serviço da api para alterar o código de barras
+    let result = await apiServices.updateFatura(barCodeData.id, { codigo_barras: barCodeData.code })
+
+    //exibir notificação do processo no final
+    if (JSON.stringify(result).includes('atualizada')) {
+      notifications.show({
+        title: 'Notificação',
+        message: 'Código de barras atualizado com sucesso',
+        color: 'yellow',
+        //icon:
+        loading: false
+      })
+    }
+    else {
+      notifications.show({
+        title: 'Notificação',
+        message: 'Erro ao atualizar código de barras: ' + result.error,
+        color: 'red',
+        //icon:
+        loading: false
+      })
+    }
+
+    //desativa o input
+    setBarCodeInputDisabled(true)
+
+    //desativa o botão de alterar
+    setBarCodeActionBtnDisabled(true)
   }
 
   return (
@@ -146,7 +181,46 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
       </Modal>
 
       <Modal opened={barCodeModal} onClose={closeBarCodeModal} title="Codigo de barras" size={'md'} centered>
-        <p>{barCodeData?.code}</p>
+        <TextInput
+          value={barCodeData?.code}
+          disabled={barCodeInputDisabled}
+          onChange={(e) => {
+            let barCode = { ...barCodeData };
+            barCode.code = e.currentTarget.value
+
+            setBarCodeData(barCode)
+            //permite o clique no botão p/ enviar a alteração
+            setBarCodeActionBtnDisabled(false)
+            console.log(barCodeData)
+          }}
+
+        />
+        <br />
+        {/* <Button variant="filled" size='compact-sm' onClick={(e) => {
+          setBarCodeInputDisabled(false)
+        }}>Alterar</Button> */}
+        <Group>
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            color="yellow"
+            onClick={() => {
+              setBarCodeInputDisabled(false)
+            }}
+          >
+            <IconPencil size={20} />
+          </ActionIcon>
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            color="yellow"
+            onClick={handleEditBarCodeBtn}
+            disabled={barCodeActionBtnDisabled}
+            bg={'transparent'}
+          >
+            <IconCheck size={20} color='green' />
+          </ActionIcon>
+        </Group>
       </Modal>
       <DataTable
         height={320}
