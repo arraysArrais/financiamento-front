@@ -2,7 +2,7 @@ import { DataTable } from 'mantine-datatable';
 import dayjs from 'dayjs';
 import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
-import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text, TextInput } from '@mantine/core';
+import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text, TextInput, NumberInput } from '@mantine/core';
 import { IconCheck, IconPencil, IconPhoto, IconBarcode, IconCopy } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
@@ -42,6 +42,11 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
   const [barCodeInputDisabled, setBarCodeInputDisabled] = useState(true)
   const [barCodeActionBtnDisabled, setBarCodeActionBtnDisabled] = useState(true)
 
+  const [valorFatura, setValorFatura] = useState<any>(0)
+  const [valorParcelaModal, { open: openValorParcelaModal, close: closeValorParcelaModal }] = useDisclosure(false); //modal edição código da fatura
+  const [valorFaturaInputDisabled, setValorFaturaInputDisabled] = useState(true)
+  const [valorFaturaActionBtnDisabled, setValorFaturaActionBtnDisabled] = useState(true)
+
   let valorPago = data.reduce((totalizador, prox) => {
     if (prox.status == 'Paga') {
       totalizador += +prox.valor;
@@ -62,16 +67,45 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
     setRecords(data.slice(from, to));
   }, [page]);
 
-  const handleEditAction = () => {
+  const handleEditAction = async (parcela_id: number) => {
+    openValorParcelaModal()
 
+    let parcela = data.find((e) => e.id == parcela_id);
+
+    if (parcela?.valor) {
+      setValorFatura(parcela)
+    }
+  }
+
+  const handleEditBtn = async (parcela_id: number) => {
     //chamar serviço para editar valor da fatura
-    notifications.show({
-      title: 'Notificação',
-      message: 'Fatura editada!',
-      color: 'yellow',
-      //icon:
-      loading: false
-    })
+    let result = await apiServices.updateFatura(parcela_id, { valor: valorFatura.valor })
+
+    //exibir notificação do processo no final
+    if (JSON.stringify(result).includes('atualizada')) {
+      notifications.show({
+        title: 'Notificação',
+        message: 'Valor da fatura atualizado com sucesso',
+        color: 'green',
+        //icon:
+        loading: false
+      })
+    }
+    else {
+      notifications.show({
+        title: 'Notificação',
+        message: 'Erro ao atualizar valor da fatura: ' + result.error,
+        color: 'red',
+        //icon:
+        loading: false
+      })
+    }
+
+    //desativa o input e botão de enviar
+    setValorFaturaActionBtnDisabled(true)
+    setValorFaturaInputDisabled(true)
+    closeValorParcelaModal()
+    closeParcelaModal()
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -201,6 +235,7 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
             barCode.code = e.currentTarget.value
 
             setBarCodeData(barCode)
+
             //permite o clique no botão p/ enviar a alteração
             setBarCodeActionBtnDisabled(false)
             console.log(barCodeData)
@@ -208,9 +243,6 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
 
         />
         <br />
-        {/* <Button variant="filled" size='compact-sm' onClick={(e) => {
-          setBarCodeInputDisabled(false)
-        }}>Alterar</Button> */}
         <Group justify='end'>
           <ActionIcon
             size="sm"
@@ -226,7 +258,7 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
             size="sm"
             variant="subtle"
             color="yellow"
-            onClick={() => {handleEditBarCodeBtn(barCodeData.id)}}
+            onClick={() => { handleEditBarCodeBtn(barCodeData.id) }}
             disabled={barCodeActionBtnDisabled}
             bg={'transparent'}
           >
@@ -241,8 +273,54 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
           </ActionIcon>
         </Group>
 
-     
+
       </Modal>
+      <Modal opened={valorParcelaModal} onClose={closeValorParcelaModal} title="Editar valor da parcela" size={'md'} centered>
+        <NumberInput
+          value={valorFatura.valor}
+          disabled={valorFaturaInputDisabled}
+          hideControls={true}
+          onChange={(e) => {
+            let fatura = { ...valorFatura }
+            fatura.valor = +e.valueOf()
+            console.log("----------FATURAA!------------", fatura)
+            setValorFatura(fatura)
+
+            //permite o clique no botão p/ enviar a alteração
+            setValorFaturaActionBtnDisabled(false)
+          }}
+        />
+
+        <br />
+        {/* <Button variant="filled" size='compact-sm' onClick={(e) => {
+          setBarCodeInputDisabled(false)
+        }}>Alterar</Button> */}
+        <Group justify='end'>
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            color="yellow"
+            onClick={() => {
+              setValorFaturaInputDisabled(false)
+            }}
+          >
+            <IconPencil size={20} />
+          </ActionIcon>
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            color="yellow"
+            onClick={() => { handleEditBtn(valorFatura.id) }}
+            disabled={valorFaturaActionBtnDisabled}
+            bg={'transparent'}
+          >
+            <IconCheck size={20} color='green' />
+          </ActionIcon>
+        </Group>
+
+
+      </Modal>
+
       <DataTable
         height={320}
         striped={true}
@@ -279,7 +357,7 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
                   size="sm"
                   variant="subtle"
                   color="yellow"
-                  onClick={() => handleEditAction()}
+                  onClick={() => handleEditAction(element.id)}
                 >
                   <IconPencil size={16} />
                 </ActionIcon>
