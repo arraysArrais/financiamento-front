@@ -124,7 +124,7 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
       notifications.show({
         title: 'Notificação',
         message: 'Código de barras atualizado com sucesso',
-        color: 'yellow',
+        color: 'green',
         //icon:
         loading: false
       })
@@ -148,6 +148,14 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
 
   const handleCopyButton = () => {
     navigator.clipboard.writeText(barCodeData.code)
+
+    notifications.show({
+      title: 'Notificação',
+      message: 'Código de barras copiado para área de transferência',
+      color: 'green',
+      //icon:
+      loading: false
+    })
   }
 
   return (
@@ -295,7 +303,7 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
                 <ActionIcon
                   size="sm"
                   variant="subtle"
-                  color="blue"
+                  color="gray"
                   onClick={() => handleCodeBarAction(element.id)}
                 >
 
