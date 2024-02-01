@@ -105,7 +105,6 @@ export const AddFinanciamento = () => {
                         const updatedEditFinanciamento = { ...createFinanciamento, objeto: updatedValue };
                         form.setFieldValue('objeto', e.currentTarget.value)
                         setCreateFinanciamento(updatedEditFinanciamento);
-                        console.log(createFinanciamento)
                     }}
                     />
                     <TextInput {...form.getInputProps('descricao')} leftSection={letterIcon} label="Descrição" placeholder="Descrição do objeto a ser financiado" name="descricao" value={form.values.descricao} onChange={(e) => {
@@ -113,8 +112,6 @@ export const AddFinanciamento = () => {
                         const updatedEditFinanciamento = { ...createFinanciamento, descricao: updatedValue };
                         form.setFieldValue('descricao', e.currentTarget.value)
                         setCreateFinanciamento(updatedEditFinanciamento);
-                        console.log(createFinanciamento)
-                        console.log(form)
                     }} />
                     <Box>
                         {/* <input {...form.getInputProps('vencimento_primeira_parcela')} type='date' className="dataInput" name="vencimento_primeira_parcela" 
@@ -139,7 +136,6 @@ export const AddFinanciamento = () => {
                                 form.setFieldValue('vencimento_primeira_parcela', e)
                                 const updatedEditFinanciamento = { ...createFinanciamento, vencimento_primeira_parcela: e };
                                 setCreateFinanciamento(updatedEditFinanciamento);
-                                console.log(createFinanciamento)
                             }}
                         />
 
@@ -160,8 +156,6 @@ export const AddFinanciamento = () => {
                                 }
                                 const updatedEditFinanciamento = { ...createFinanciamento, id_responsavel: id };
                                 setCreateFinanciamento(updatedEditFinanciamento);
-                                console.log(updatedEditFinanciamento)
-                                console.log(form)
                             }}
                             searchable
                             nothingFoundMessage="Responsável não encontrado"
@@ -181,7 +175,6 @@ export const AddFinanciamento = () => {
                                 }
                                 const updatedEditFinanciamento = { ...createFinanciamento, id_pagador: id };
                                 setCreateFinanciamento(updatedEditFinanciamento);
-                                console.log(updatedEditFinanciamento)
                             }}
                             searchable
                             nothingFoundMessage="Pagador não encontrado"
@@ -212,7 +205,6 @@ export const AddFinanciamento = () => {
                             setNumberInput(+e)
                             const updatedEditFinanciamento = { ...createFinanciamento, valor_parcela: +numberInput };
                             setCreateFinanciamento(updatedEditFinanciamento);
-                            console.log(createFinanciamento)
                         }}
                         label="Valor da parcela"
                         prefix="R$ "
@@ -239,7 +231,6 @@ export const AddFinanciamento = () => {
                         onChange={(e) => {
                             setFile(e)
                             form.setFieldValue('img_obj', e)
-                            console.log(e)
                         }}
                         clearable
                         value={file}

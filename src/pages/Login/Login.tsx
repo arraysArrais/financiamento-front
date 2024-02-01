@@ -51,7 +51,6 @@ export function Login(props: PaperProps) {
         color: 'red',
       })
     }
-    console.log(loginResponse)
     navigate('/')
   }
   return (

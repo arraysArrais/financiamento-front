@@ -49,7 +49,6 @@ export const Financiamentos = () => {
                 else {
                     setLoading(false)
                 }
-                console.log(result)
             }, 2000)
         }
         fetchData();
@@ -102,7 +101,6 @@ export const Financiamentos = () => {
 
     const editFinancimanentoAction = async () => {
         closeEditModal()
-        console.log("EDIT FINANCIAMENTO!!", editFinanciamento)
 
         const notificacao = notifications.show({
             loading: true,

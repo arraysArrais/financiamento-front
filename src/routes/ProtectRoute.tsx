@@ -14,7 +14,6 @@ export const ProtectRoute = ({ children }: Props) => {
           const checkLogin = async () => {
             if (authApi.getToken()) {
                 const isValidated = await authApi.validateToken();
-                console.log("Validado pelo backend ?", isValidated)
                 if (isValidated) {
                     setIsAuth(true)
                 } else {

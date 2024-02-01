@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
 import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text, TextInput } from '@mantine/core';
-import { IconCheck, IconPencil, IconPhoto, IconBarcode } from '@tabler/icons-react';
+import { IconCheck, IconPencil, IconPhoto, IconBarcode, IconCopy } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
 import { useDisclosure } from '@mantine/hooks';
@@ -42,7 +42,6 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
   const [barCodeInputDisabled, setBarCodeInputDisabled] = useState(true)
   const [barCodeActionBtnDisabled, setBarCodeActionBtnDisabled] = useState(true)
 
-  console.log("PARCELAS!!", data)
   let valorPago = data.reduce((totalizador, prox) => {
     if (prox.status == 'Paga') {
       totalizador += +prox.valor;
@@ -105,19 +104,20 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
 
   const handleCodeBarAction = async (parcela_id: number) => {
     openBarCodeModal() // abre o modal pra exibir o código de barras
+    setBarCodeData([]); //esvazia o state do codigo de barras para não exibir o mesmo para todos
+
 
     try {
       const result = await apiServices.getCodBarra(parcela_id);
       setBarCodeData(result)
-      console.log("VALOR DENTRO DO STATE DO CODIGO DE BARRA", barCodeData)
     } catch (error) {
       console.log('Erro ao buscar código de barra da parcela ' + parcela_id)
     }
   }
 
-  const handleEditBarCodeBtn = async () => {
+  const handleEditBarCodeBtn = async (parcela_id: number) => {
     //chamar serviço da api para alterar o código de barras
-    let result = await apiServices.updateFatura(barCodeData.id, { codigo_barras: barCodeData.code })
+    let result = await apiServices.updateFatura(parcela_id, { codigo_barras: barCodeData.code })
 
     //exibir notificação do processo no final
     if (JSON.stringify(result).includes('atualizada')) {
@@ -144,6 +144,10 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
 
     //desativa o botão de alterar
     setBarCodeActionBtnDisabled(true)
+  }
+
+  const handleCopyButton = () => {
+    navigator.clipboard.writeText(barCodeData.code)
   }
 
   return (
@@ -199,7 +203,7 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
         {/* <Button variant="filled" size='compact-sm' onClick={(e) => {
           setBarCodeInputDisabled(false)
         }}>Alterar</Button> */}
-        <Group>
+        <Group justify='end'>
           <ActionIcon
             size="sm"
             variant="subtle"
@@ -214,13 +218,22 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
             size="sm"
             variant="subtle"
             color="yellow"
-            onClick={handleEditBarCodeBtn}
+            onClick={() => {handleEditBarCodeBtn(barCodeData.id)}}
             disabled={barCodeActionBtnDisabled}
             bg={'transparent'}
           >
             <IconCheck size={20} color='green' />
           </ActionIcon>
+          <ActionIcon
+            size="sm"
+            onClick={handleCopyButton}
+            bg={'transparent'}
+          >
+            <IconCopy size={20} color='gray' />
+          </ActionIcon>
         </Group>
+
+     
       </Modal>
       <DataTable
         height={320}
