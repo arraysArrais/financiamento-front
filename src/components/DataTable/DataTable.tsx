@@ -2,7 +2,7 @@ import { DataTable } from 'mantine-datatable';
 import dayjs from 'dayjs';
 import { FormEvent, useEffect, useState } from 'react';
 import { Parcela } from './types/ParcelaProps'
-import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text, TextInput, NumberInput } from '@mantine/core';
+import { ActionIcon, Box, Button, FileInput, Group, Loader, Modal, Stack, rem, Image, Card, Progress, Text, TextInput, NumberInput, Tooltip } from '@mantine/core';
 import { IconCheck, IconPencil, IconPhoto, IconBarcode, IconCopy } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import './style.css'
@@ -244,33 +244,39 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
         />
         <br />
         <Group justify='end'>
-          <ActionIcon
-            size="sm"
-            variant="subtle"
-            color="yellow"
-            onClick={() => {
-              setBarCodeInputDisabled(false)
-            }}
-          >
-            <IconPencil size={20} />
-          </ActionIcon>
-          <ActionIcon
-            size="sm"
-            variant="subtle"
-            color="yellow"
-            onClick={() => { handleEditBarCodeBtn(barCodeData.id) }}
-            disabled={barCodeActionBtnDisabled}
-            bg={'transparent'}
-          >
-            <IconCheck size={20} color='green' />
-          </ActionIcon>
-          <ActionIcon
-            size="sm"
-            onClick={handleCopyButton}
-            bg={'transparent'}
-          >
-            <IconCopy size={20} color='gray' />
-          </ActionIcon>
+          <Tooltip label={'Editar'}>
+            <ActionIcon
+              size="sm"
+              variant="subtle"
+              color="yellow"
+              onClick={() => {
+                setBarCodeInputDisabled(false)
+              }}
+            >
+              <IconPencil size={20} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label={'Salvar'}>
+            <ActionIcon
+              size="sm"
+              variant="subtle"
+              color="yellow"
+              onClick={() => { handleEditBarCodeBtn(barCodeData.id) }}
+              disabled={barCodeActionBtnDisabled}
+              bg={'transparent'}
+            >
+              <IconCheck size={20} color='green' />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label={'Copiar para área de transferência'}>
+            <ActionIcon
+              size="sm"
+              onClick={handleCopyButton}
+              bg={'transparent'}
+            >
+              <IconCopy size={20} color='gray' />
+            </ActionIcon>
+          </Tooltip>
         </Group>
 
 
@@ -296,26 +302,30 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
           setBarCodeInputDisabled(false)
         }}>Alterar</Button> */}
         <Group justify='end'>
-          <ActionIcon
-            size="sm"
-            variant="subtle"
-            color="yellow"
-            onClick={() => {
-              setValorFaturaInputDisabled(false)
-            }}
-          >
-            <IconPencil size={20} />
-          </ActionIcon>
-          <ActionIcon
-            size="sm"
-            variant="subtle"
-            color="yellow"
-            onClick={() => { handleEditBtn(valorFatura.id) }}
-            disabled={valorFaturaActionBtnDisabled}
-            bg={'transparent'}
-          >
-            <IconCheck size={20} color='green' />
-          </ActionIcon>
+          <Tooltip label={'Editar'}>
+            <ActionIcon
+              size="sm"
+              variant="subtle"
+              color="yellow"
+              onClick={() => {
+                setValorFaturaInputDisabled(false)
+              }}
+            >
+              <IconPencil size={20} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label={'Salvar alteração'}>
+            <ActionIcon
+              size="sm"
+              variant="subtle"
+              color="yellow"
+              onClick={() => { handleEditBtn(valorFatura.id) }}
+              disabled={valorFaturaActionBtnDisabled}
+              bg={'transparent'}
+            >
+              <IconCheck size={20} color='green' />
+            </ActionIcon>
+          </Tooltip>
         </Group>
 
 
@@ -353,23 +363,27 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
                   <IconCheck size={16} />
                 </ActionIcon>
                   : <></>}
-                <ActionIcon
-                  size="sm"
-                  variant="subtle"
-                  color="yellow"
-                  onClick={() => handleEditAction(element.id)}
-                >
-                  <IconPencil size={16} />
-                </ActionIcon>
-                {element.status == 'Paga' ?
+                <Tooltip label={'Editar valor'} >
                   <ActionIcon
                     size="sm"
                     variant="subtle"
-                    color="indigo"
-                    onClick={() => handleViewComprovanteAction(element.id)}
+                    color="yellow"
+                    onClick={() => handleEditAction(element.id)}
                   >
-                    <IconPhoto size={16} />
-                  </ActionIcon> : <></>}
+                    <IconPencil size={16} />
+                  </ActionIcon>
+                </Tooltip>
+                {element.status == 'Paga' ?
+                  <Tooltip label={'Visualizar comprovante'}>
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="indigo"
+                      onClick={() => handleViewComprovanteAction(element.id)}
+                    >
+                      <IconPhoto size={16} />
+                    </ActionIcon>
+                  </Tooltip> : <></>}
                 {/*               <ActionIcon
                   size="sm"
                   variant="subtle"
@@ -378,15 +392,16 @@ const ParcelaTable: React.FC<ParcelaTableProps> = ({ data, closeParcelaModal }) 
                 >
                   <IconTrash size={16} />
                 </ActionIcon> */}
-                <ActionIcon
-                  size="sm"
-                  variant="subtle"
-                  color="gray"
-                  onClick={() => handleCodeBarAction(element.id)}
-                >
-
-                  <IconBarcode size={16} />
-                </ActionIcon>
+                <Tooltip label={'Código de barras'}>
+                  <ActionIcon
+                    size="sm"
+                    variant="subtle"
+                    color="gray"
+                    onClick={() => handleCodeBarAction(element.id)}
+                  >
+                    <IconBarcode size={16} />
+                  </ActionIcon>
+                </Tooltip>
               </Group>
             ),
           },
